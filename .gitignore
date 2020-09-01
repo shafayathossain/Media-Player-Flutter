@@ -606,3 +606,4 @@ $RECYCLE.BIN/
 
 # Build runner generated file
 *.g.dart
+/.flutter-plugins-dependencies

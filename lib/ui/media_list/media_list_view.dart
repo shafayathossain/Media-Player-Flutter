@@ -8,6 +8,7 @@ import 'package:media_player/data/rest/rest_service.dart';
 import 'package:media_player/ui/media_list/media_bloc.dart';
 import 'package:media_player/ui/media_list/media_event.dart';
 import 'package:media_player/ui/media_list/media_state.dart';
+import 'package:media_player/ui/router.dart';
 
 class MediaListView extends StatelessWidget {
   @override
@@ -39,123 +40,129 @@ class MediaListView extends StatelessWidget {
           builder: (contextB) {
             BlocProvider.of<MediaBloc>(contextB).add(MediaEvent());
             return Container(
+                clipBehavior: Clip.none,
                 child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                BlocConsumer<MediaBloc, MediaState>(
-                  listener: (context, state) {},
-                  buildWhen: (context, state) =>
-                      state is LoadingState || state is MediaListState,
-                  builder: (context, state) {
-                    print(state);
-                    if (state is LoadingState) {
-                      return Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Neumorphic(
-                                padding: EdgeInsets.all(5),
-                                style: NeumorphicStyle(
-                                    shape: NeumorphicShape.concave,
-                                    boxShape: NeumorphicBoxShape.circle(),
-                                    depth: 8,
-                                    lightSource: LightSource.topLeft),
-                                child: CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.blueGrey),
-                                ))
-                          ],
-                        ),
-                      );
-                    } else if (state is MediaListState) {
-                      return Expanded(
-                        child: Container(
-                          child: ListView.builder(
-                              itemCount: state.mediaItems.length,
-                              itemBuilder: (context, index) {
-                                return NeumorphicButton(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Row(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    BlocConsumer<MediaBloc, MediaState>(
+                      listener: (context, state) {},
+                      buildWhen: (context, state) =>
+                          state is LoadingState || state is MediaListState,
+                      builder: (context, state) {
+                        print(state);
+                        if (state is LoadingState) {
+                          return Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Neumorphic(
+                                    padding: EdgeInsets.all(5),
+                                    style: NeumorphicStyle(
+                                        shape: NeumorphicShape.concave,
+                                        boxShape: NeumorphicBoxShape.circle(),
+                                        depth: 8,
+                                        lightSource: LightSource.topLeft),
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation(
+                                          Colors.blueGrey),
+                                    ))
+                              ],
+                            ),
+                          );
+                        } else if (state is MediaListState) {
+                          return Expanded(
+                            child: Container(
+                              child: ListView.builder(
+                                  itemCount: state.mediaItems.length,
+                                  itemBuilder: (context, index) {
+                                    return NeumorphicButton(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          NeumorphicText(
-                                            "${index + 1}",
-                                            textStyle: NeumorphicTextStyle(
-                                              fontSize: 26,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            style: NeumorphicStyle(
-                                                depth: 1,
-                                                intensity: 1,
-                                                shadowLightColor: Colors.white,
-                                                color: Colors.blue),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                                left: 10, right: 10),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                NeumorphicText(
-                                                  state.mediaItems[index]
-                                                      .englishName
-                                                      .trim(),
-                                                  textStyle:
-                                                      NeumorphicTextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  style: NeumorphicStyle(
-                                                      depth: 0,
-                                                      intensity: 1,
-                                                      shadowLightColor:
-                                                          Colors.white38,
-                                                      color: Colors.blueGrey),
+                                          Row(
+                                            children: <Widget>[
+                                              NeumorphicText(
+                                                "${index + 1}",
+                                                textStyle: NeumorphicTextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                NeumorphicText(
-                                                  state.mediaItems[index]
-                                                      .englishNameTranslation,
-                                                  textStyle:
-                                                      NeumorphicTextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  style: NeumorphicStyle(
-                                                      depth: 0,
-                                                      intensity: 1,
-                                                      shadowLightColor:
-                                                          Colors.white38,
-                                                      color: Colors.blueGrey),
-                                                )
-                                              ],
-                                            ),
+                                                style: NeumorphicStyle(
+                                                    depth: 0,
+                                                    intensity: 1,
+                                                    shadowLightColor:
+                                                        Colors.white,
+                                                    color: Colors.blueGrey),
+                                              ),
+                                              Container(
+                                                margin: EdgeInsets.only(
+                                                    left: 10, right: 10),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    NeumorphicText(
+                                                      "${state.mediaItems[index].englishName}",
+                                                      textStyle:
+                                                          NeumorphicTextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      style: NeumorphicStyle(
+                                                          depth: 0,
+                                                          intensity: 1,
+                                                          shadowLightColor:
+                                                              Colors.white38,
+                                                          color:
+                                                              Colors.blueGrey),
+                                                    ),
+                                                    NeumorphicText(
+                                                      state.mediaItems[index]
+                                                          .englishNameTranslation,
+                                                      textStyle:
+                                                          NeumorphicTextStyle(
+                                                        fontSize: 16,
+                                                      ),
+                                                      style: NeumorphicStyle(
+                                                          depth: 0,
+                                                          intensity: 1,
+                                                          shadowLightColor:
+                                                              Colors.white38,
+                                                          color:
+                                                              Colors.blueGrey),
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            ],
                                           )
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                  onPressed: () {},
-                                  style: NeumorphicStyle(
-                                      shadowLightColor: Colors.white38,
-                                      depth: 3,
-                                      intensity: 1,
-                                      lightSource: LightSource.topLeft),
-                                  margin: EdgeInsets.all(10),
-                                );
-                              }),
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
-                )
-              ],
-            ));
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            contextB, playerRoute,
+                                            arguments: state.mediaItems[index]);
+                                      },
+                                      style: NeumorphicStyle(
+                                          shadowLightColor: Colors.white,
+                                          depth: 3,
+                                          intensity: 1,
+                                          lightSource: LightSource.topLeft),
+                                      margin: EdgeInsets.all(10),
+                                    );
+                                  }),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    )
+                  ],
+                ));
           },
         ),
       ),

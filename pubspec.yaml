@@ -32,6 +32,7 @@ dependencies:
   flutter_bloc: ^6.0.2
   http: ^0.12.2
   dio: ^3.0.10
+  flutter_playout: ^1.0.38
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -43,6 +44,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeumorphicApp(
       title: 'Media Player',
+      darkTheme: NeumorphicThemeData(),
       theme: NeumorphicThemeData(),
       onGenerateRoute: Router.generateRoute,
       initialRoute: homeRoute,
