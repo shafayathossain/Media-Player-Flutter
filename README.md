@@ -1,16 +1,31 @@
-# media_player
+# Sample Media Player
 
-Media player integration in flutter.
+Sample media player implementation in flutter. As media player implementation in iOS and android are different, here I tried to implement AVPlayer for iOS and ExoPlayer for android platform by writting platform specific code.
 
-## Getting Started
+#### Features
+- Play and pause media
+- Media controller in status bar and lock screen
 
-This project is a starting point for a Flutter application.
+## How to run
+Run following commands after cloning this repository:
+```sh
+$ flutter pub get
+$ flutter run
+```
+# Third party libraries used
+- [Flutter Neumorphic](https://pub.dev/packages/flutter_neumorphic)
+- [RxDart](https://pub.dev/packages/rxdart)
+- [Flutter Bloc](https://pub.dev/packages/flutter_bloc)
+- [Parcent Indicator](https://pub.dev/packages/percent_indicator)
+- [Build Runner](https://pub.dev/packages/build_runner)
+- [Dio](https://pub.dev/packages/dio)
 
-A few resources to get you started if this is your first Flutter project:
+### Bugs
+- Audio is not playing background in iOS
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Contribution
+1. Fork it
+2. Create your feature branch (git checkout -b new_branch)
+3. Commit your changes (git commit -m 'New feature')
+4. Push to the branch (git push origin new_branch)
+5. Create new Pull Request

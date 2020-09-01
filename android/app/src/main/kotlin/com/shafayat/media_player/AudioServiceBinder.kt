@@ -345,11 +345,11 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
         val notificationBuilder = PlayerNotificationUtil.from(
                 activity, context!!, mMediaSessionCompat, mNotificationChannelId)
         if (capabilities and PlaybackStateCompat.ACTION_PAUSE != 0L) {
-            notificationBuilder.addAction(R.drawable.ic_pause, "Pause",
+            notificationBuilder.addAction(android.R.drawable.ic_media_pause, "Pause",
                     PlayerNotificationUtil.getActionIntent(context!!, KeyEvent.KEYCODE_MEDIA_PAUSE))
         }
         if (capabilities and PlaybackStateCompat.ACTION_PLAY != 0L) {
-            notificationBuilder.addAction(R.drawable.ic_play, "Play",
+            notificationBuilder.addAction(android.R.drawable.ic_media_play, "Play",
                     PlayerNotificationUtil.getActionIntent(context!!, KeyEvent.KEYCODE_MEDIA_PLAY))
         }
         val notificationManager = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
