@@ -12,6 +12,8 @@ Run following commands after cloning this repository:
 $ flutter pub get
 $ flutter run
 ```
+# Screens
+<img src="https://raw.githubusercontent.com/shafayathossain/Media-Player-Flutter/master/screen/screen.gif" width="185" height="400">
 
 # Motivation
 Special thanks to [Flutter Playout](https://pub.dev/packages/flutter_playout) library because most of the native code is taken from here.
