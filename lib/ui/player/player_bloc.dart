@@ -9,18 +9,25 @@ import 'package:media_player/ui/player/player_state.dart';
 
 class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   final PlayerRepository _repository;
-
-  PlayerBloc(this._repository) : super(null);
-
-  StreamController<Status> playerStreamController = StreamController<Status>();
-  Stream<Status> get playerStatus => playerStreamController.stream;
+  static PlayerBloc bloc;
+  static Status lastStatus = Status.stopped;
+  StreamController<PlayerState> playerStreamController =
+      StreamController<PlayerState>.broadcast();
+  Stream<PlayerState> get playerStatus => playerStreamController.stream;
 
   StreamController<List<double>> playerProgressController =
-      StreamController<List<double>>();
+      StreamController<List<double>>.broadcast();
   Stream<List<double>> get playerProgress => playerProgressController.stream;
 
-  StreamController<int> playerDurationController = StreamController<int>();
+  StreamController<int> playerDurationController =
+      StreamController<int>.broadcast();
   Stream<int> get playerDuration => playerDurationController.stream;
+
+  factory PlayerBloc(repository) {
+    return bloc ??= PlayerBloc._internal(repository);
+  }
+
+  PlayerBloc._internal(this._repository) : super(null);
 
   @override
   Stream<PlayerState> mapEventToState(PlayerEvent event) async* {
@@ -39,10 +46,15 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   }
 
   void listenForPlayer() async {
-    await for (Status status in _repository.listenForPlayer()) {
-      print(status);
-      playerStreamController.sink.add(status);
+    if (_repository.getMediaItem() != null) {
+      playerStreamController.sink
+          .add(PlayerState(lastStatus, _repository.getMediaItem()));
     }
+    _repository.listenForPlayer().listen((status) {
+      lastStatus = status;
+      playerStreamController.sink
+          .add(PlayerState(status, _repository.getMediaItem()));
+    });
   }
 
   void listenForProgress() async {

@@ -11,5 +11,7 @@ abstract class PlayerRepository {
 
   Future<void> play(MediaItem item);
 
+  MediaItem getMediaItem();
+
   void pause();
 }

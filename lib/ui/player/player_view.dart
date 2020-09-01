@@ -6,29 +6,50 @@ import 'package:media_player/data/repository/player_repository_impl.dart';
 import 'package:media_player/data/repository/player_states.dart';
 import 'package:media_player/ui/player/player_bloc.dart';
 import 'package:media_player/ui/player/player_event.dart';
+import 'package:media_player/ui/player/player_state.dart';
 import 'package:media_player/utils.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class PlayerView extends StatelessWidget {
   MediaItem item;
+  bool isPlaying;
+  bool oldItem = false;
+
+  PlayerView({this.item, this.isPlaying});
 
   @override
   Widget build(BuildContext context) {
-    item = ModalRoute.of(context).settings.arguments;
+    if (item != null) {
+      oldItem = true;
+    } else {
+      oldItem = false;
+    }
+    if (item != null && isPlaying == null) {
+      isPlaying = true;
+    } else if (isPlaying == null) {
+      isPlaying = false;
+    }
+    item ??= ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
         appBar: NeumorphicAppBar(),
         body: BlocProvider(
           create: (context) => PlayerBloc(PlayerRepositoryImpl()),
-          child: StatefulPlayerView(item),
+          child: StatefulPlayerView(
+            item,
+            isPlaying: isPlaying,
+            oldItem: oldItem,
+          ),
         ));
   }
 }
 
 class StatefulPlayerView extends StatefulWidget {
   final MediaItem item;
+  bool isPlaying = false;
+  bool oldItem = false;
 
-  StatefulPlayerView(this.item);
+  StatefulPlayerView(this.item, {this.isPlaying = false, this.oldItem});
 
   @override
   State createState() {
@@ -57,6 +78,9 @@ class PlayerViewState extends State<StatefulPlayerView>
     });
     BlocProvider.of<PlayerBloc>(context).add(ListenEvent());
     BlocProvider.of<PlayerBloc>(context).add(ProgressEvent());
+    if (!widget.oldItem) {
+      BlocProvider.of<PlayerBloc>(context).add(PlayEvent(widget.item));
+    }
   }
 
   @override
@@ -112,19 +136,37 @@ class PlayerViewState extends State<StatefulPlayerView>
           children: <Widget>[
             Column(
               children: <Widget>[
-                Text(
-                  widget.item.englishName,
-                  style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.blueGrey,
-                      fontWeight: FontWeight.bold),
+                Hero(
+                  tag: "english name",
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Container(
+                      child: Text(
+                        widget.item.englishName,
+                        style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.blueGrey,
+                            decoration: TextDecoration.none,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                 ),
-                Text(
-                  widget.item.englishNameTranslation,
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.blueGrey,
-                      fontWeight: FontWeight.bold),
+                Hero(
+                  tag: "english translation",
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Container(
+                      child: Text(
+                        widget.item.englishNameTranslation,
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.blueGrey,
+                            decoration: TextDecoration.none,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10),
@@ -194,64 +236,76 @@ class PlayerViewState extends State<StatefulPlayerView>
             )
           ],
         ),
-        Container(
-          height: 60,
-          width: 60,
-          child: Neumorphic(
-            padding: EdgeInsets.all(2),
-            style: NeumorphicStyle(
-                shape: NeumorphicShape.concave,
-                boxShape: NeumorphicBoxShape.circle(),
-                depth: 8,
-                shadowLightColor: Colors.white,
-                lightSource: LightSource.topLeft),
-            child: StreamBuilder(
-              stream: BlocProvider.of<PlayerBloc>(context).playerStatus,
-              builder: (context, AsyncSnapshot<Status> snapshot) {
-                if (snapshot.hasData) {
-                  return NeumorphicButton(
-                    padding: EdgeInsets.all(0),
-                    onPressed: () {
-                      if (snapshot.data != Status.playing) {
-                        BlocProvider.of<PlayerBloc>(context)
-                            .add(PlayEvent(widget.item));
-                      } else {
-                        BlocProvider.of<PlayerBloc>(context).add(PauseEvent());
-                      }
-                    },
-                    style: NeumorphicStyle(
-                        depth: 8,
-                        shadowLightColor: Colors.white,
-                        color: Colors.indigoAccent,
-                        boxShape: NeumorphicBoxShape.circle()),
-                    child: Icon(
-                      snapshot.data != Status.playing
-                          ? Icons.play_arrow
-                          : Icons.pause,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-                  );
-                } else {
-                  return NeumorphicButton(
-                    padding: EdgeInsets.all(0),
-                    onPressed: () {
-                      BlocProvider.of<PlayerBloc>(context)
-                          .add(PlayEvent(widget.item));
-                    },
-                    style: NeumorphicStyle(
-                        depth: 8,
-                        shadowLightColor: Colors.white,
-                        color: Colors.indigoAccent,
-                        boxShape: NeumorphicBoxShape.circle()),
-                    child: Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-                  );
-                }
-              },
+        Hero(
+          tag: "button",
+          child: Container(
+            height: 60,
+            width: 60,
+            child: Neumorphic(
+              padding: EdgeInsets.all(2),
+              style: NeumorphicStyle(
+                  shape: NeumorphicShape.concave,
+                  boxShape: NeumorphicBoxShape.circle(),
+                  depth: 8,
+                  shadowLightColor: Colors.white,
+                  lightSource: LightSource.topLeft),
+              child: StreamBuilder(
+                stream: BlocProvider.of<PlayerBloc>(context).playerStatus,
+                builder: (context, AsyncSnapshot<PlayerState> snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data.playerStatus == Status.playing) {
+                      widget.isPlaying = true;
+                    } else {
+                      widget.isPlaying = false;
+                    }
+                    return NeumorphicButton(
+                      padding: EdgeInsets.all(0),
+                      onPressed: () {
+                        if (snapshot.data.playerStatus != Status.playing) {
+                          BlocProvider.of<PlayerBloc>(context)
+                              .add(PlayEvent(widget.item));
+                        } else {
+                          BlocProvider.of<PlayerBloc>(context)
+                              .add(PauseEvent());
+                        }
+                      },
+                      style: NeumorphicStyle(
+                          depth: 8,
+                          shadowLightColor: Colors.white,
+                          color: Colors.indigoAccent,
+                          boxShape: NeumorphicBoxShape.circle()),
+                      child: Icon(
+                        !widget.isPlaying ? Icons.play_arrow : Icons.pause,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                    );
+                  } else {
+                    return NeumorphicButton(
+                      padding: EdgeInsets.all(0),
+                      onPressed: () {
+                        if (!widget.isPlaying) {
+                          BlocProvider.of<PlayerBloc>(context)
+                              .add(PlayEvent(widget.item));
+                        } else {
+                          BlocProvider.of<PlayerBloc>(context)
+                              .add(PauseEvent());
+                        }
+                      },
+                      style: NeumorphicStyle(
+                          depth: 8,
+                          shadowLightColor: Colors.white,
+                          color: Colors.indigoAccent,
+                          boxShape: NeumorphicBoxShape.circle()),
+                      child: Icon(
+                        !widget.isPlaying ? Icons.play_arrow : Icons.pause,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
           ),
         ),
