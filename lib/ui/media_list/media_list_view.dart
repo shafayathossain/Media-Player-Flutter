@@ -206,7 +206,7 @@ class MediaListView extends StatelessWidget {
                                   children: <Widget>[
                                     CircleAvatar(
                                       backgroundImage: AssetImage(
-                                          "assets/images/img_afasi.jpg"),
+                                          "assets/images/ic_flutter.png"),
                                     ),
                                     Column(
                                       crossAxisAlignment:

@@ -30,7 +30,7 @@ class PlayerView extends StatelessWidget {
       isPlaying = false;
     }
     item ??= ModalRoute.of(context).settings.arguments;
-
+    print("33----$oldItem");
     return Scaffold(
         appBar: NeumorphicAppBar(),
         body: BlocProvider(
@@ -38,7 +38,7 @@ class PlayerView extends StatelessWidget {
           child: StatefulPlayerView(
             item,
             isPlaying: isPlaying,
-            oldItem: oldItem,
+            oldItem: this.oldItem,
           ),
         ));
   }
@@ -49,10 +49,11 @@ class StatefulPlayerView extends StatefulWidget {
   bool isPlaying = false;
   bool oldItem = false;
 
-  StatefulPlayerView(this.item, {this.isPlaying = false, this.oldItem});
+  StatefulPlayerView(this.item, {this.isPlaying, this.oldItem});
 
   @override
   State createState() {
+    print("56----$oldItem");
     return PlayerViewState();
   }
 }
@@ -65,6 +66,7 @@ class PlayerViewState extends State<StatefulPlayerView>
   @override
   void initState() {
     super.initState();
+    print("69----${widget.oldItem}");
     controllerPlayer = new AnimationController(
         duration: const Duration(milliseconds: 15000), vsync: this);
     animationPlayer =
@@ -104,9 +106,11 @@ class PlayerViewState extends State<StatefulPlayerView>
                     child: Container(
                       width: 150,
                       height: 150,
+                      color: Color(0xFFDDE6E8),
                       child: CircleAvatar(
+                        backgroundColor: Color(0xFFDDE6E8),
                         backgroundImage:
-                            AssetImage("assets/images/img_afasi.jpg"),
+                            AssetImage("assets/images/ic_flutter.png"),
                       ),
                     ),
                   ),
@@ -116,7 +120,7 @@ class PlayerViewState extends State<StatefulPlayerView>
                     height: 50,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.blue,
+                      color: Color(0xFFDDE6E8),
                     ),
                     child: Neumorphic(
                       padding: EdgeInsets.all(5),
