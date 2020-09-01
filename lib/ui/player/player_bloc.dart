@@ -11,8 +11,16 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   final PlayerRepository _repository;
 
   PlayerBloc(this._repository) : super(null);
+
   StreamController<Status> playerStreamController = StreamController<Status>();
   Stream<Status> get playerStatus => playerStreamController.stream;
+
+  StreamController<List<double>> playerProgressController =
+      StreamController<List<double>>();
+  Stream<List<double>> get playerProgress => playerProgressController.stream;
+
+  StreamController<int> playerDurationController = StreamController<int>();
+  Stream<int> get playerDuration => playerDurationController.stream;
 
   @override
   Stream<PlayerState> mapEventToState(PlayerEvent event) async* {
@@ -23,6 +31,10 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       pause();
     } else if (event is ListenEvent) {
       listenForPlayer();
+    } else if (event is ProgressEvent) {
+      listenForProgress();
+    } else if (event is DurationEvent) {
+      listenForDuration();
     }
   }
 
@@ -30,6 +42,20 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     await for (Status status in _repository.listenForPlayer()) {
       print(status);
       playerStreamController.sink.add(status);
+    }
+  }
+
+  void listenForProgress() async {
+    await for (List<int> progress in _repository.listenForProgress()) {
+      playerProgressController.sink.add(
+          (progress.map((e) => e.toDouble()).toList()
+            ..add(progress[1] / (progress[0]))));
+    }
+  }
+
+  void listenForDuration() async {
+    await for (int duration in _repository.listenForDuration()) {
+      playerDurationController.sink.add(duration);
     }
   }
 

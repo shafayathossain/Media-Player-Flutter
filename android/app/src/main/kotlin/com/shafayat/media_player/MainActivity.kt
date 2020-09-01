@@ -100,6 +100,7 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler, EventCha
     override fun onDestroy() {
         super.onDestroy()
         try {
+            reset()
             unBoundAudioService()
             doUnbindMediaNotificationManagerService()
 
@@ -239,6 +240,7 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler, EventCha
         if (audioServiceBinder != null) {
             audioServiceBinder!!.reset()
             audioServiceBinder!!.cleanPlayerNotification()
+            unBoundAudioService()
             audioServiceBinder = null
         }
     }
@@ -284,7 +286,6 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler, EventCha
     private fun unBoundAudioService() {
         if (audioServiceBinder != null) {
             unbindService(serviceConnection)
-            reset()
         }
     }
 

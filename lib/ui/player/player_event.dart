@@ -11,3 +11,7 @@ class PlayEvent extends PlayerEvent {
 class PauseEvent extends PlayerEvent {}
 
 class ListenEvent extends PlayerEvent {}
+
+class ProgressEvent extends PlayerEvent {}
+
+class DurationEvent extends PlayerEvent {}

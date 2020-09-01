@@ -6,6 +6,8 @@ import 'package:media_player/data/repository/player_repository_impl.dart';
 import 'package:media_player/data/repository/player_states.dart';
 import 'package:media_player/ui/player/player_bloc.dart';
 import 'package:media_player/ui/player/player_event.dart';
+import 'package:media_player/utils.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class PlayerView extends StatelessWidget {
   MediaItem item;
@@ -54,6 +56,7 @@ class PlayerViewState extends State<StatefulPlayerView>
       }
     });
     BlocProvider.of<PlayerBloc>(context).add(ListenEvent());
+    BlocProvider.of<PlayerBloc>(context).add(ProgressEvent());
   }
 
   @override
@@ -84,9 +87,9 @@ class PlayerViewState extends State<StatefulPlayerView>
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 55, left: 55),
-                    width: 40,
-                    height: 40,
+                    margin: EdgeInsets.only(top: 50, left: 50),
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.blue,
@@ -103,6 +106,93 @@ class PlayerViewState extends State<StatefulPlayerView>
                   )
                 ],
               )),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                Text(
+                  widget.item.englishName,
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.blueGrey,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  widget.item.englishNameTranslation,
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.blueGrey,
+                      fontWeight: FontWeight.bold),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    "Mishary bin Rashid Alafasy",
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey),
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Expanded(
+              child: StreamBuilder(
+                stream: BlocProvider.of<PlayerBloc>(context).playerProgress,
+                builder: (context, AsyncSnapshot<List<double>> progress) {
+                  print(progress);
+                  return Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: Neumorphic(
+                          padding: EdgeInsets.only(
+                              left: 8, right: 8, top: 2, bottom: 2),
+                          style: NeumorphicStyle(
+                              shape: NeumorphicShape.convex,
+                              depth: 8,
+                              shadowLightColor: Colors.white,
+                              lightSource: LightSource.topLeft),
+                          child: LinearPercentIndicator(
+                            padding: EdgeInsets.all(0),
+                            animationDuration: 1000,
+                            animation: true,
+                            lineHeight: 14,
+                            animateFromLastPercent: true,
+                            percent: progress.hasData ? progress.data[2] : 0,
+                            fillColor: Colors.blueGrey,
+                            progressColor: Colors.blueGrey,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15, top: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              "${millisecondsToTimeString(progress.hasData ? progress.data[1] : 0)}",
+                              style: TextStyle(
+                                  color: Colors.blueGrey, fontSize: 16),
+                            ),
+                            Text(
+                              "${millisecondsToTimeString(progress.hasData ? progress.data[0] : 0)}",
+                              style: TextStyle(
+                                  color: Colors.blueGrey, fontSize: 16),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  );
+                },
+              ),
+            )
+          ],
         ),
         Container(
           height: 60,

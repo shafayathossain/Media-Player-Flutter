@@ -34,6 +34,7 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
     private var isPlayerReady = false
     private var isBound = true
     var isMediaChanging = false
+    var updateAudioProgressThread: Thread? = null
 
     /**
      * Whether the [MediaPlayer] broadcasted an error.
@@ -113,7 +114,7 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
             if (audioPlayer!!.isPlaying) {
                 audioPlayer!!.stop()
             }
-            audioPlayer!!.reset()
+            audioPlayer?.release()
             audioPlayer = null
             updatePlaybackState(PlayerState.COMPLETE)
         }
@@ -146,6 +147,7 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
 
     override fun onDestroy() {
         isBound = false
+        updateAudioProgressThread?.interrupt()
         try {
             cleanPlayerNotification()
             if (audioPlayer != null) {
@@ -190,7 +192,7 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
         updatePlaybackState(PlayerState.PLAYING)
 
         /* This thread object will send update audio progress message to caller activity every 1 second */
-        val updateAudioProgressThread: Thread = object : Thread() {
+        updateAudioProgressThread = object : Thread() {
             override fun run() {
                 while (isBound) {
                     try {
@@ -209,25 +211,19 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
                             }
                         }
 
-                        // Create update audio duration message.
-                        val updateAudioDurationMsg = Message()
-                        updateAudioDurationMsg.what = UPDATE_AUDIO_DURATION
-
-                        // Send the message to caller activity's update audio progressbar Handler object.
-                        audioProgressUpdateHandler!!.sendMessage(updateAudioDurationMsg)
                     } catch (e: Exception) {
                         Log.e(TAG, "onPrepared:updateAudioProgressThread: ", e)
                     }
                 }
             }
         }
-        updateAudioProgressThread.start()
+        updateAudioProgressThread?.start()
     }
 
     override fun onCompletion(mp: MediaPlayer) {
         if (audioPlayer != null) {
             audioPlayer!!.pause()
-            updatePlaybackState(PlayerState.PAUSED)
+            updatePlaybackState(PlayerState.COMPLETE)
         }
     }
 
@@ -259,6 +255,10 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
         val updateAudioProgressMsg = Message()
         updateAudioProgressMsg.what = UPDATE_AUDIO_PROGRESS_BAR
         audioProgressUpdateHandler!!.sendMessage(updateAudioProgressMsg)
+
+        val updateAudioDurationMsg = Message()
+        updateAudioDurationMsg.what = UPDATE_AUDIO_DURATION
+        audioProgressUpdateHandler!!.sendMessage(updateAudioDurationMsg)
     }
 
     private val playbackStateBuilder: PlaybackStateCompat.Builder
@@ -303,6 +303,14 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
                     audioProgressUpdateHandler!!.sendMessage(updateAudioProgressMsg)
                     PlaybackStateCompat.STATE_STOPPED
                 }
+            }
+            PlayerState.COMPLETE -> {
+                playbackStateCompat = PlaybackStateCompat.STATE_STOPPED
+                val updateAudioProgressMsg = Message()
+                updateAudioProgressMsg.what = UPDATE_PLAYER_STATE_TO_COMPLETE
+
+                // Send the message to caller activity's update audio Handler object.
+                audioProgressUpdateHandler!!.sendMessage(updateAudioProgressMsg)
             }
         }
         if (audioPlayer != null) {
@@ -366,6 +374,7 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
      */
     private inner class MediaSessionCallback(player: MediaPlayer?) : MediaSessionCompat.Callback() {
         override fun onPause() {
+            Log.d("Callback", "pause")
             audioPlayer!!.pause()
         }
 
@@ -378,6 +387,7 @@ class AudioServiceBinder : Binder(), FlutterPlayer, OnPreparedListener, OnComple
         }
 
         override fun onStop() {
+            Log.d("Callback", "stop")
             audioPlayer!!.stop()
         }
 

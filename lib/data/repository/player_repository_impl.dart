@@ -9,12 +9,13 @@ import 'package:media_player/data/repository/player_states.dart';
 class PlayerRepositoryImpl extends PlayerRepository with PlayerObserver {
   final _audioUrl = "http://server8.mp3quran.net/afs/";
   final _player = Audio.instance();
+  int duration = 1;
   final controller = StreamController<Status>();
   final durationController = StreamController<int>();
-  final timeConroller = StreamController<int>();
+  final timeController = StreamController<int>();
   Stream<Status> get playerState => controller.stream;
-  Stream<int> get duration => durationController.stream;
-  Stream<int> get time => timeConroller.stream;
+  Stream<int> get durationStream => durationController.stream;
+  Stream<int> get timeStream => timeController.stream;
 
   @override
   Stream<Status> listenForPlayer() {
@@ -22,8 +23,16 @@ class PlayerRepositoryImpl extends PlayerRepository with PlayerObserver {
   }
 
   @override
+  Stream<List<int>> listenForProgress() {
+    return timeStream.map((event) {
+      print(duration);
+      return [duration, event];
+    });
+  }
+
+  @override
   Stream<int> listenForDuration() {
-    return duration;
+    return durationStream;
   }
 
   @override
@@ -55,12 +64,13 @@ class PlayerRepositoryImpl extends PlayerRepository with PlayerObserver {
   @override
   void onComplete() {
     _player.reset();
+    timeController.sink.add(duration);
     controller.sink.add(Status.stopped);
   }
 
   @override
   void onTime(int position) {
-    timeConroller.add(position);
+    timeController.add(position * 1000);
   }
 
   @override
@@ -68,6 +78,8 @@ class PlayerRepositoryImpl extends PlayerRepository with PlayerObserver {
 
   @override
   void onDuration(int duration) {
+    print("duration $duration");
+    this.duration = duration;
     durationController.add(duration);
   }
 
