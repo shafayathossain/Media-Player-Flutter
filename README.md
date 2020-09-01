@@ -1,6 +1,6 @@
 # Sample Media Player
 
-Sample media player implementation in flutter. As media player implementation in iOS and android are different, here I tried to implement AVPlayer for iOS and ExoPlayer for android platform by writting platform specific code.
+Sample media player implementation in flutter. As media player implementation in iOS and android are different, here I tried to implement AVPlayer for iOS and ExoPlayer for android platform by writing platform specific code.
 
 #### Features
 - Play and pause media
@@ -12,6 +12,10 @@ Run following commands after cloning this repository:
 $ flutter pub get
 $ flutter run
 ```
+
+# Motivation
+Special thanks to [Flutter Playout](https://pub.dev/packages/flutter_playout) library because most of the native code is taken from here.
+
 # Third party libraries used
 - [Flutter Neumorphic](https://pub.dev/packages/flutter_neumorphic)
 - [RxDart](https://pub.dev/packages/rxdart)
@@ -20,8 +24,6 @@ $ flutter run
 - [Build Runner](https://pub.dev/packages/build_runner)
 - [Dio](https://pub.dev/packages/dio)
 
-### Bugs
-- Audio is not playing background in iOS
 
 # Contribution
 1. Fork it
